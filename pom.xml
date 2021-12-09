@@ -5,21 +5,21 @@
 
 	<groupId>com.redhat.insights.expandjsonsmt</groupId>
 	<artifactId>kafka-connect-smt-expandjsonsmt</artifactId>
-	<version>0.0.7</version>
+	<version>0.0.7-structs</version>
 
 	<repositories>
 		<repository>
 			<id>confluent</id>
-			<url>http://packages.confluent.io/maven/</url>
+			<url>https://packages.confluent.io/maven/</url>
 		</repository>
 	</repositories>
 
 	<properties>
 		<java.version>1.8</java.version>
-		<kafka.version>2.0.0</kafka.version>
-		<kafka.scala.version>2.11</kafka.scala.version>
-		<scala.version>${kafka.scala.version}.8</scala.version>
-		<confluent.version>5.0.0</confluent.version>
+		<kafka.version>3.0.0</kafka.version>
+		<kafka.scala.version>2.13</kafka.scala.version>
+		<scala.version>${kafka.scala.version}.3</scala.version>
+		<confluent.version>7.0.0</confluent.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
@@ -42,7 +42,17 @@
 		<dependency>
 			<groupId>org.mongodb</groupId>
 			<artifactId>bson</artifactId>
-			<version>3.11.0</version>
+			<version>4.4.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.12.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.32</version>
 		</dependency>
 
     
@@ -50,13 +60,13 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.13.1</version>
+			<version>4.13.2</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
-			<version>3.3.0</version>
+			<version>3.21.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -90,7 +100,7 @@
 		<dependency>
 			<groupId>org.apache.curator</groupId>
 			<artifactId>curator-test</artifactId>
-			<version>2.9.0</version>
+			<version>5.1.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

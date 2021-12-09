@@ -18,14 +18,13 @@ package com.redhat.insights.expandjsonsmt;
 
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.connect.connector.ConnectRecord;
-import org.apache.kafka.connect.transforms.Transformation;
-import org.apache.kafka.connect.transforms.util.SimpleConfig;
 import org.apache.kafka.connect.data.Field;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.errors.DataException;
-
+import org.apache.kafka.connect.transforms.Transformation;
+import org.apache.kafka.connect.transforms.util.SimpleConfig;
 import org.bson.BsonArray;
 import org.bson.BsonDocument;
 import org.bson.BsonString;
@@ -88,7 +87,7 @@ abstract class ExpandJSON<R extends ConnectRecord<R>> implements Transformation<
             final Struct value = requireStruct(recordValue, PURPOSE);
             final HashMap<String, BsonDocument> jsonParsedFields = parseJsonFields(value, sourceFields, delimiterSplit);
 
-            final Schema updatedSchema = makeUpdatedSchema(null, value, jsonParsedFields);
+            final Schema updatedSchema = makeUpdatedSchema(new Key(), value, jsonParsedFields);
             final Struct updatedValue = makeUpdatedValue(null, value, updatedSchema, jsonParsedFields);
 
             return newRecord(record, updatedSchema, updatedValue);
@@ -188,15 +187,16 @@ abstract class ExpandJSON<R extends ConnectRecord<R>> implements Transformation<
      * @param jsonParsedFields Values of parsed json string fields.
      * @return New schema for output record.
      */
-    private Schema makeUpdatedSchema(String parentKey, Struct value, HashMap<String, BsonDocument> jsonParsedFields) {
-        final SchemaBuilder builder = SchemaBuilder.struct();
+    private Schema makeUpdatedSchema(Key parentKey, Struct value, HashMap<String, BsonDocument> jsonParsedFields) {
+        final SchemaBuilder builder = SchemaBuilder.struct().name(parentKey.getCamelCasePath());
         for (Field field : value.schema().fields()) {
             final Schema fieldSchema;
-            final String absoluteKey = joinKeys(parentKey, field.name());
+            final Key childKey = parentKey.childKey(field.name());
+            final String absoluteKey = childKey.getPath();
             if (jsonParsedFields.containsKey(absoluteKey)) {
-                fieldSchema = SchemaParser.bsonDocument2Schema(jsonParsedFields.get(absoluteKey));
+                fieldSchema = SchemaParser.bsonDocument2Schema(childKey, jsonParsedFields.get(absoluteKey));
             } else if (field.schema().type().equals(Schema.Type.STRUCT)) {
-                fieldSchema = makeUpdatedSchema(absoluteKey, value.getStruct(field.name()), jsonParsedFields);
+                fieldSchema = makeUpdatedSchema(childKey, value.getStruct(field.name()), jsonParsedFields);
             } else {
                 fieldSchema = field.schema();
             }
